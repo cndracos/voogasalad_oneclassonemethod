@@ -102,6 +102,58 @@ public class Actions {
     		}
     	};
     }
+
+	public static Consumer<Map<String,Component>> fireballUp() {
+		return e1 -> {
+			if(e1.containsKey(XPosition.KEY) && e1.containsKey(YPosition.KEY) && e1.containsKey(XVelocity.KEY) && e1.containsKey(Width.KEY)) {
+				XPosition x = (XPosition) e1.get(XPosition.KEY);
+				YPosition y = (YPosition) e1.get(YPosition.KEY);
+				YVelocity yv = (YVelocity) e1.get(YVelocity.KEY);
+				Height h = (Height) e1.get(Height.KEY);
+
+				Map<String,Component> ne = new HashMap<>();
+				int id = (int) System.currentTimeMillis();
+				Sprite s = null;
+				try {
+					s = new Sprite(id, "fireball.png");
+				} catch (FileNotFoundException e) {
+					System.out.println("fireball image does not exits");
+				}
+
+				double vel = 150;
+				double yf = y.getData() + h.getData();
+				s.getImage().setFitHeight(20);
+				s.getImage().setFitWidth(40);
+				s.getImage().setY(yf);
+				s.getImage().setX(x.getData());
+
+				Component[] newList = {
+						new XPosition(id, x.getData()),
+						new YPosition(id, y.getData()),
+						new XVelocity(id, 0),
+						new YVelocity(id, vel),
+							s,
+						new FireballCollision(id),
+						new DamageValue(id, 20),
+						new DamageLifetime(id, 1),
+						new EntityType(id, "Fire"),
+						new Height(id, 20),
+						new Width(id, 40),
+						new Type(id, "Fire"),
+						new Animated(id, "fireballanimation.properties")
+				};
+
+				for(Component c : newList) {
+					if(c != null) {
+						ne.put(c.getKey(), c);
+					}
+				}
+
+				sm.addEntity(id, ne);
+				sm.setActives();
+			}
+		};
+	}
     
     
     /**
