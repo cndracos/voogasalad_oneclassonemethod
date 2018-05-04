@@ -12,16 +12,16 @@ public class KoopaCollision extends Collidable {
 
         this.setOnDirection(CollisionDirection.Top, Actions.damage());
 
-        this.setOnDirection(CollisionDirection.Bot, Actions.bounce(CollisionDirection.Bot, 40));
+        this.setOnDirection(CollisionDirection.Bot, Actions.bounce(3, 40));
 
         this.setOnDirection(CollisionDirection.Left, (e1, e2) -> {
             Actions.damage().accept(e1, e2);
-            Actions.bounce(CollisionDirection.Left, 40).accept(e1, e2);
+            Actions.bounce(0, 40).accept(e1, e2);
         });
 
         this.setOnDirection(CollisionDirection.Right, (e1, e2) -> {
             Actions.damage().accept(e1, e2);
-            Actions.bounce(CollisionDirection.Right, 40).accept(e1, e2);
+            Actions.bounce(1, 40).accept(e1, e2);
         });
     }
 }

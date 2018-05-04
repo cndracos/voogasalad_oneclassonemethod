@@ -397,20 +397,29 @@ public class Actions {
         };
     }*/
 
-    public static BiConsumer<Map <String, Component>, Map<String, Component>> bounce (CollisionDirection cd, double speed) {
+	/**
+	 *
+	 * Bounces in a specific direction
+	 * 0 = right; 1 = left; 2 = down; 3= up
+	 *
+	 * @param direction where to bounce
+	 * @param speed of the bounce
+	 * @return the action
+	 */
+    public static BiConsumer<Map <String, Component>, Map<String, Component>> bounce (int direction, double speed) {
 		//System.out.println("bouncing");
-    	switch (cd) {
-			case Left:
-				return horizontalBounce(speed);
-			case Right:
-				return horizontalBounce(-speed);
-			case Top:
-				return verticalBounce(speed);
-			case Bot:
-				return verticalBounce(-speed);
-		}
-		System.out.println("returned null");
+		if (direction == 0) return horizontalBounce(speed);
+		if (direction == 1) return horizontalBounce(-speed);
+		if (direction == 2) return verticalBounce(speed);
+		if (direction == 3) return verticalBounce(-speed);
 		return null;
+	}
+
+	public static BiConsumer<Map <String, Component>, Map<String, Component>> blockBounce (int direction, double speed) {
+		return (Serializable & BiConsumer<Map<String, Component>, Map<String, Component>>) (e1, e2) -> {
+			YVelocity yv = (YVelocity) e2.get(YVelocity.KEY);
+			if (yv.getData()>=0) bounce(direction, speed).accept(e1, e2);
+		};
 	}
 
 	private static BiConsumer<Map<String, Component>, Map<String, Component>> verticalBounce(double v) {

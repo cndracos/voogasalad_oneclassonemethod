@@ -2,6 +2,7 @@ package authoring.entities;
 
 import engine.actions.Actions;
 import engine.components.Collidable;
+import engine.components.Passable;
 import engine.components.presets.DoodleBlockCollision;
 import engine.systems.collisions.CollisionDirection;
 
@@ -28,6 +29,7 @@ public class Block extends InteractableEntity {
 
 	private void addDefaultComponents() {
 		this.add(new DoodleBlockCollision(this.getID()));
+		this.add(new Passable(this.getID()));
 	}
 
 }

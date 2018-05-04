@@ -10,17 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import engine.components.Collidable;
-import engine.components.Component;
-import engine.components.EntityType;
-import engine.components.Height;
-import engine.components.Player;
-import engine.components.Type;
-import engine.components.Width;
-import engine.components.XPosition;
-import engine.components.XVelocity;
-import engine.components.YPosition;
-import engine.components.YVelocity;
+import engine.components.*;
 import engine.systems.AbstractSystem;
 import engine.systems.ISystem;
 
@@ -77,25 +67,28 @@ public class Collision extends AbstractSystem implements ISystem {
 		if (cd != null) {
 
 			this.evaluateCollidable(cd, map1, map2);
-			
-			switch (cd) {
 
-			case Top:
-				y1.setData(y2.getData() - h1);
-				break;
-				
-			case Bot:
-				y1.setData(y2.getData() + h2);
-				break;
-				
-			case Left:
-				x1.setData(x2.getData() - w1);
-				break;
-				
-			case Right:
-				x1.setData(x2.getData() + w2);
-				break;
+			if (!map1.containsKey(Passable.KEY) && !map2.containsKey(Passable.KEY)) {
 
+				switch (cd) {
+
+					case Top:
+						y1.setData(y2.getData() - h1);
+						break;
+
+					case Bot:
+						y1.setData(y2.getData() + h2);
+						break;
+
+					case Left:
+						x1.setData(x2.getData() - w1);
+						break;
+
+					case Right:
+						x1.setData(x2.getData() + w2);
+						break;
+
+				}
 			}
 		}
 	}
