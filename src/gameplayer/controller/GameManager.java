@@ -51,7 +51,7 @@ public class GameManager {
 
         setActiveLevel(FIRST_LEVEL);
 
-        numOfLives = livesSetup();
+        //lifeCount.addListener((o, oldVal, newVal) -> controller.liveChange((int) newVal));
 
         numOfLevels = levelMap.keySet().size();
         if(winKeys.keySet().size() > 0){

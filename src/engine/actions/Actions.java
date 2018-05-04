@@ -102,6 +102,58 @@ public class Actions {
     		}
     	};
     }
+
+	public static Consumer<Map<String,Component>> fireballUp() {
+		return e1 -> {
+			if(e1.containsKey(XPosition.KEY) && e1.containsKey(YPosition.KEY) && e1.containsKey(XVelocity.KEY) && e1.containsKey(Width.KEY)) {
+				XPosition x = (XPosition) e1.get(XPosition.KEY);
+				YPosition y = (YPosition) e1.get(YPosition.KEY);
+				YVelocity yv = (YVelocity) e1.get(YVelocity.KEY);
+				Height h = (Height) e1.get(Height.KEY);
+
+				Map<String,Component> ne = new HashMap<>();
+				int id = (int) System.currentTimeMillis();
+				Sprite s = null;
+				try {
+					s = new Sprite(id, "fireball.png");
+				} catch (FileNotFoundException e) {
+					System.out.println("fireball image does not exits");
+				}
+
+				double vel = 150;
+				double yf = y.getData() + h.getData();
+				s.getImage().setFitHeight(20);
+				s.getImage().setFitWidth(40);
+				s.getImage().setY(yf);
+				s.getImage().setX(x.getData());
+
+				Component[] newList = {
+						new XPosition(id, x.getData()),
+						new YPosition(id, y.getData()),
+						new XVelocity(id, 0),
+						new YVelocity(id, vel),
+							s,
+						new FireballCollision(id),
+						new DamageValue(id, 20),
+						new DamageLifetime(id, 1),
+						new EntityType(id, "Fire"),
+						new Height(id, 20),
+						new Width(id, 40),
+						new Type(id, "Fire"),
+						new Animated(id, "fireballanimation.properties")
+				};
+
+				for(Component c : newList) {
+					if(c != null) {
+						ne.put(c.getKey(), c);
+					}
+				}
+
+				sm.addEntity(id, ne);
+				sm.setActives();
+			}
+		};
+	}
     
     
     /**
@@ -325,7 +377,7 @@ public class Actions {
         return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
 			if (actor1.containsKey(EntityType.KEY) && actor2.containsKey(EntityType.KEY)) {
 				EntityType e1 = (EntityType) actor1.get(EntityType.KEY);
-				EntityType e2 = (EntityType) actor1.get(EntityType.KEY);
+				EntityType e2 = (EntityType) actor2.get(EntityType.KEY);
 				if (!e1.getData().equals(e2.getData())) { //cannot harm same entity type
 					giveDamage(actor1, actor2);
 				}
@@ -397,20 +449,29 @@ public class Actions {
         };
     }*/
 
-    public static BiConsumer<Map <String, Component>, Map<String, Component>> bounce (CollisionDirection cd, double speed) {
+	/**
+	 *
+	 * Bounces in a specific direction
+	 * 0 = right; 1 = left; 2 = down; 3= up
+	 *
+	 * @param direction where to bounce
+	 * @param speed of the bounce
+	 * @return the action
+	 */
+    public static BiConsumer<Map <String, Component>, Map<String, Component>> bounce (int direction, double speed) {
 		//System.out.println("bouncing");
-    	switch (cd) {
-			case Left:
-				return horizontalBounce(speed);
-			case Right:
-				return horizontalBounce(-speed);
-			case Top:
-				return verticalBounce(speed);
-			case Bot:
-				return verticalBounce(-speed);
-		}
-		System.out.println("returned null");
+		if (direction == 0) return horizontalBounce(speed);
+		if (direction == 1) return horizontalBounce(-speed);
+		if (direction == 2) return verticalBounce(speed);
+		if (direction == 3) return verticalBounce(-speed);
 		return null;
+	}
+
+	public static BiConsumer<Map <String, Component>, Map<String, Component>> blockBounce (int direction, double speed) {
+		return (Serializable & BiConsumer<Map<String, Component>, Map<String, Component>>) (e1, e2) -> {
+			YVelocity yv = (YVelocity) e2.get(YVelocity.KEY);
+			if (yv.getData()>=0) bounce(direction, speed).accept(e1, e2);
+		};
 	}
 
 	private static BiConsumer<Map<String, Component>, Map<String, Component>> verticalBounce(double v) {
@@ -450,6 +511,7 @@ public class Actions {
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
+
 		XPosition px = (XPosition) followed.get(XPosition.KEY);
         YPosition py = (YPosition) followed.get(YPosition.KEY);
 

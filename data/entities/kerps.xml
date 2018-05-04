@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entity game="player" name="kerps"><DamageLifetime>0.0</DamageLifetime><Type>Enemy</Type><XAcceleration>0.0</XAcceleration><Name>kerps</Name><YAcceleration>0.0</YAcceleration><Health>20.0</Health><YVelocity>0.0</YVelocity><XVelocity>0.0</XVelocity><DamageValue>0.0</DamageValue><Sprite>8Bit.png</Sprite></Entity>

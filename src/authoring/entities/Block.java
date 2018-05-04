@@ -1,6 +1,9 @@
 package authoring.entities;
 
 import engine.components.Collidable;
+import engine.components.Passable;
+import engine.components.presets.DoodleBlockCollision;
+import engine.systems.collisions.CollisionDirection;
 
 /**
  * Block class that acts as a preset. Makes it easier to users to create an enemy without needing 
@@ -20,13 +23,12 @@ public class Block extends InteractableEntity {
 	public Block(int ID, String name) {
 		super(ID);
 		this.setName(name);
-		this.setPresetType(TYPE);
+		addDefaultComponents();
 	}
 
 	private void addDefaultComponents() {
-		Collidable c = new Collidable(this.getID());
-		//c.setOnDirection(CollisionDirection.Bot, Actions.bounce(0));
-		this.add(c);
+		this.add(new DoodleBlockCollision(this.getID()));
+		this.add(new Passable(this.getID()));
 	}
 
 }

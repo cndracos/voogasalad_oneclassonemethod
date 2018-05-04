@@ -55,7 +55,7 @@ public class Collidable implements Component, BehaviorComponent {
 	 * @param entityMap2	Second entity, usually the one being collided with
 	 */
 	public void action(CollisionDirection cd, Map<String, Component> entityMap1, Map<String, Component> entityMap2) {
-		if(actions.get(cd) != null && actions.containsKey(cd) && !suppressed) {
+		if(actions.containsKey(cd) && !suppressed) {
 			actions.get(cd).accept(entityMap1, entityMap2);
 		}
 		suppressed = false;

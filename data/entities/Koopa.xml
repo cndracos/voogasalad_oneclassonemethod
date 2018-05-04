@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entity game="DoodleJump" name="Koopa"><Health>10.0</Health><XVelocity>0.0</XVelocity><Sprite>8Bit.png</Sprite><Name>Koopa</Name><Type>DoodleEnemy</Type><DamageLifetime>1.0</DamageLifetime><DamageValue>100.0</DamageValue><YVelocity>0.0</YVelocity><YAcceleration>0.0</YAcceleration><XAcceleration>0.0</XAcceleration></Entity>

@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entity game="CS308Jump" name="CSEnemy"><Type>DoodleEnemy</Type><XAcceleration>0.0</XAcceleration><YAcceleration>0.0</YAcceleration><DamageLifetime>1.0</DamageLifetime><YVelocity>0.0</YVelocity><Name>CSEnemy</Name><Sprite>cell.png</Sprite><Health>50.0</Health><DamageValue>10.0</DamageValue><XVelocity>0.0</XVelocity></Entity>

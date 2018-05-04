@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entity game="player" name="merrio"><DamageLifetime>1.0</DamageLifetime><Type>User</Type><XAcceleration>0.0</XAcceleration><Name>merrio</Name><YAcceleration>0.0</YAcceleration><Health>50.0</Health><YVelocity>0.0</YVelocity><XVelocity>0.0</XVelocity><DamageValue>20.0</DamageValue><Sprite>mario.png</Sprite></Entity>
