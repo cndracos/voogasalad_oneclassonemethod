@@ -19,7 +19,7 @@ public class DoodleEnemyCollision extends Collidable {
         });
 
         this.setOnDirection(CollisionDirection.Bot, (Serializable & BiConsumer<Map<String,Component>,Map<String,Component>>) (e1, e2) -> {
-            Actions.damage().accept(e1, e2);
+            Actions.bounce(3, 30).accept(e1, e2);
         });
 
         this.setOnDirection(CollisionDirection.Right, (Serializable & BiConsumer<Map<String,Component>,Map<String,Component>>) (e1, e2) -> {
@@ -27,7 +27,7 @@ public class DoodleEnemyCollision extends Collidable {
         });
 
         this.setOnDirection(CollisionDirection.Top, (Serializable & BiConsumer<Map<String,Component>,Map<String,Component>>) (e1, e2) -> {
-            Actions.bounce(3, 30).accept(e1, e2);
+            Actions.damage().accept(e1, e2);
         });
     }
 }

@@ -351,7 +351,7 @@ public class Actions {
         return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
 			if (actor1.containsKey(EntityType.KEY) && actor2.containsKey(EntityType.KEY)) {
 				EntityType e1 = (EntityType) actor1.get(EntityType.KEY);
-				EntityType e2 = (EntityType) actor1.get(EntityType.KEY);
+				EntityType e2 = (EntityType) actor2.get(EntityType.KEY);
 				if (!e1.getData().equals(e2.getData())) { //cannot harm same entity type
 					giveDamage(actor1, actor2);
 				}
@@ -459,6 +459,7 @@ public class Actions {
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
+
 		XPosition px = (XPosition) followed.get(XPosition.KEY);
         YPosition py = (YPosition) followed.get(YPosition.KEY);
 
