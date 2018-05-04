@@ -2,14 +2,15 @@ package data;
 
 import engine.components.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import authoring.entities.Entity;
 import authoring.gamestate.GameState;
 import authoring.gamestate.Level;
-/**
- * @author Conrad 
- */
+
 public class DataGameState {
     /*@Author Conrad this class represents the complete information that is contained in a
      * game-- all levels which contain entities which contain all components

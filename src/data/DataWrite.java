@@ -185,6 +185,7 @@ public class DataWrite {
     private static void writeGame(DataGameState dataGameState) {
         //writes the xml to the folder created above
         String name = dataGameState.getGameName();
+        System.out.println(dataGameState.getComponents().size()+"sdkfjhsdkf;jhsdkjfskjdf");
         File game = new File(GAME_PATH + name + PLAYER + XML_FILETYPE);
         FileOutputStream fos = null;
         try {

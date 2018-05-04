@@ -16,7 +16,6 @@ import authoring.exceptions.AuthoringException;
 public class EntityBuilderData {
 
 	private Map<Class, Object[]> componentAttributes = new HashMap<>();
-
 	private final static String COMPONENT_PREFIX = "engine.components.";
 	private final String NAME_ERROR_MESSAGE = "There must be a value in the \"Name\" field.\n";
 	private final String COMPONENT_ERROR_MESSAGE = "The component %s does not exist. Please check the package engine.components to make sure that the component has been created.\n";

@@ -3,12 +3,20 @@ package authoring.views;
 import java.util.HashMap;
 import java.util.Map;
 
+import authoring.actions.ActionAdderView;
+import authoring.exceptions.AuthoringAlert;
+import authoring.exceptions.AuthoringException;
+import authoring.factories.ClickElementType;
+import authoring.factories.ElementFactory;
 import data.DataRead;
 import engine.components.Sprite;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
@@ -22,6 +30,8 @@ public class EntityBox extends VBox {
 	private static final double PROPORTION = 3;
 	private Image image;
 	private ImageView imageView;
+	
+	private ElementFactory eFactory = new ElementFactory();
 
 	Map<Class, Object[]> componentAttributes = new HashMap<>();
 
@@ -42,6 +52,8 @@ public class EntityBox extends VBox {
 			e.consume();
 		});
 	}
+
+
 
 	private void setPreview() {
 		image = DataRead.loadImage((String) componentAttributes.get(Sprite.class)[0]);

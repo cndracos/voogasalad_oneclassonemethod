@@ -1,5 +1,6 @@
 package authoring.views.properties;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -56,7 +57,11 @@ public class LocalPropertiesView extends PropertiesView {
 		componentFormCollection = new PropertiesComponentFormCollection(entity, new String[] {""}, e-> {save((List<Component>) e);});
 		this.getRoot().getChildren().add(componentFormCollection);
 		componentFormCollection.setLanguage(language);
-		componentFormCollection.fill(this.type);
+		List<String> componentsToAdd = new ArrayList<String>();
+		for(Component c : this.entity.getComponentList()) {
+			componentsToAdd.add(c.getKey());
+		}
+		componentFormCollection.fill(componentsToAdd);
 		this.getRoot().getScene().getWindow().sizeToScene();
 	}
 	

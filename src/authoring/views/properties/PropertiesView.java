@@ -41,7 +41,7 @@ public abstract class PropertiesView implements AuthoringLanguage {
 	private Stage stage;
 	private ElementFactory eFactory = new ElementFactory();
 	private ArrayList<Element> elements = new ArrayList<>();
-	private Properties language = new Properties();
+	protected Properties language = new Properties();
 
 	/**
 	 * Initialize the root of this window as a {@code GridPane}.

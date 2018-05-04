@@ -1,6 +1,7 @@
 package authoring.forms;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.function.Consumer;
 
 public interface FormCollection {
@@ -8,7 +9,7 @@ public interface FormCollection {
 	/**
 	 * Populates the form
 	 */
-	public void fill();
+	public void fill(List<String> entityProperties);
 	
 	/**
 	 * Adds a set of Exceptions to the list of possible components for this form collection
@@ -28,8 +29,9 @@ public interface FormCollection {
 	 */
 	public List<ComponentForm> getActiveForms();
 	
-	/**
-	 * Sets the type of component form to be built
-	 */
-	public void setComponentFormType();
+	
+
+
+	public void setLanguage(Properties language);
+
 }

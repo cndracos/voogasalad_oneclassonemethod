@@ -1,12 +1,17 @@
 package authoring.views;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import authoring.factories.ClickElementType;
 import authoring.factories.ElementFactory;
 import authoring.factories.ElementType;
 import authoring.languages.AuthoringLanguage;
+import authoring.views.properties.EntityPropertiesView;
+import engine.components.Component;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -25,10 +30,12 @@ public class EntityTab extends Tab implements AuthoringLanguage {
 	Properties language = new Properties();
 	public static final double SCROLLBAR_WIDTH = 20;
 	public static final double VIEW_WIDTH = 0;
+	private static final String COMPONENT_PREFIX = "engine.components.";
 
 	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-	private ElementFactory eFactory;
+	private ElementFactory eFactory = new ElementFactory();
+	private Consumer onSave = e->{save(e);};
 
 	FlowPane pane;
 	ScrollPane externalPane;
@@ -43,6 +50,11 @@ public class EntityTab extends Tab implements AuthoringLanguage {
 		this.setClosable(false);
 		this.getStyleClass().add("entity-tab");
 		assemble();
+	}
+
+	private void save(Object e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -69,11 +81,9 @@ public class EntityTab extends Tab implements AuthoringLanguage {
 			if(mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
 				ContextMenu cMenu = new ContextMenu();
 				try {
-					MenuItem delete = (MenuItem) eFactory.buildElement(ElementType.MenuItem, "Delete");
-					delete.setOnAction(e -> {
-						removeEntity(eb);
-					});
-					cMenu.getItems().add(delete);
+					MenuItem delete = (MenuItem) eFactory.buildClickElement(ClickElementType.MenuItem, "Delete", e->{removeEntity(eb);});
+					MenuItem edit = (MenuItem) eFactory.buildClickElement(ClickElementType.MenuItem, "Edit", e->{editEntity(componentAttributes);});
+					cMenu.getItems().addAll(edit, delete);
 
 					cMenu.setAutoHide(true);
 				} catch (Exception e1) {
@@ -83,6 +93,17 @@ public class EntityTab extends Tab implements AuthoringLanguage {
 			}
 		});
 		pane.getChildren().add(eb);
+	}
+
+	private void editEntity(Map<Class,Object[]> eb) {
+		Map<Class, Object[]> sudoComponents = eb;
+		try {
+			EntityPropertiesView epv = new EntityPropertiesView(((String)eb.get(Class.forName(COMPONENT_PREFIX + "Name"))[0]), onSave);
+			epv.open();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

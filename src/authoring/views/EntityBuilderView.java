@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -41,6 +42,7 @@ import javafx.stage.Stage;
  */
 public class EntityBuilderView extends Stage {
 	private final static int LEFT_PANEL_WIDTH = 200;
+	private final static String PROPERTIES_PACKAGE = "resources.menus.Entity/";
 
 	private Properties tooltipProperties;
 	private Properties language = new Properties();
@@ -133,7 +135,8 @@ public class EntityBuilderView extends Stage {
 		comboBox.setPromptText(language.getProperty("selectObjectType"));
 		comboBox.setOnAction(e -> {
 				data.setComponent(engine.components.Type.class, getRealName(comboBox.getSelectionModel().getSelectedItem()));
-				componentFormCollection.fill(data.getType());
+				List<String> componentsToAdd = new ArrayList<String>(ResourceBundle.getBundle(PROPERTIES_PACKAGE + data.getType()).keySet());
+				componentFormCollection.fill(componentsToAdd);
 				componentFormCollection.setLanguage(language);
 				this.sizeToScene();
 		});
