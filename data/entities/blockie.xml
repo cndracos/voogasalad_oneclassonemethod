@@ -1,1 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entity game="CS308Jump" name="Blockie"><Sprite>cs308.png</Sprite><Type>Block</Type><Name>Blockie</Name></Entity>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entity game="new" name="Blockie"><Sprite>Dirt-Block1.png</Sprite><Name>Blockie</Name><Type>Block</Type></Entity>

@@ -27,8 +27,8 @@ public class Block extends InteractableEntity {
 	}
 
 	private void addDefaultComponents() {
-		this.add(new DoodleBlockCollision(this.getID()));
-		this.add(new Passable(this.getID()));
+		//this.add(new DoodleBlockCollision(this.getID()));
+		//this.add(new Passable(this.getID()));
 	}
 
 }

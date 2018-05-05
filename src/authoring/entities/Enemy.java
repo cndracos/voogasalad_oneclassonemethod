@@ -19,15 +19,11 @@ public class Enemy extends InteractableEntity {
 		this.setName(name);
 		addDefaultComponents();
 		this.setPresetType(TYPE);
-		addDefaultComponent();
 	}
 
-	private void addDefaultComponent() {
-		this.add(new KoopaCollision(this.getID()));
-	}
 	private void addDefaultComponents() {		
 		this.setEntityType(TYPE);
-		
+		this.add(new KoopaCollision(this.getID()));
 		//this.add(new Tube(this.getID()));
 		
 	}

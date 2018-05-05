@@ -30,7 +30,7 @@ public class PlayerCollision extends Collidable {
 			Actions.damage().accept(e1, e2);
 			Actions.moveUp(0).accept(e1);
 			Actions.transferScore().accept(e1, e2);
-			//Actions.xFriction(FRICTION).accept(e1, e2);
+			Actions.xFriction(FRICTION).accept(e1, e2);
 			if(e1.containsKey(Jumps.KEY)) {
 				Jumps s = (Jumps) e1.get(Jumps.KEY);
 				s.reset();
