@@ -17,8 +17,8 @@ public class LivesLabel extends Label implements IGameStatusLabel{
 
 
 	@Override
-	public double extractGameStateValue(GameManager gameManager) {
-		return gameManager.getLives();
+	public double extractGameStateValue() {
+		return GameManager.getLives();
 	}
 
 

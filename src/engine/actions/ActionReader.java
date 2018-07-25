@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 
 /**
  *
- * This is the class that the authoring will call to assign an action to an entity when adding either keyInput
- * or AI components. It uses reflection to find the action that is specified from an 'actions' class and return
+ * This is the class that the authoring will call to assign an action to an entity when adding either KeyInput,
+ * AI or Collidable actions. It uses reflection to find the action that is specified from an 'actions' class and return
  * that to the caller.
  *
  * @author cndracos
@@ -22,7 +22,6 @@ public class ActionReader {
     private Class<?>[] methodParams;
     private Object[] invokeArgs;
 
-    // Scott changed this to suppress errors
     private static Actions actions = new Actions();
 
     /**

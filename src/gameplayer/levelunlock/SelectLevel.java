@@ -1,6 +1,7 @@
 package gameplayer.levelunlock;
 
 import gameplayer.controller.LevelController;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -8,31 +9,31 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class SelectLevel extends ScrollPane {
-    private int levelProgress;
     private int numOfLevels;
+    private int currentLevel;
     private ArrayList<LevelItem> levels;
     private VBox levelColumn;
     private Scene myScene;
-    private LevelController myController;
+    private Consumer<Integer> changeLevelAction;
 
     private static final int PANE_WIDTH = 400;
     private static final int PANE_HEIGHT = 400;
 
-    public SelectLevel(int levelProgress, int numOfLevels, Stage stage, LevelController controller){
+    public SelectLevel(int numOfLevels, ReadOnlyDoubleProperty width,
+            ReadOnlyDoubleProperty height, Consumer<Integer> changeLevelAction){
         super();
-        this.myController = controller;
-        this.levelProgress = levelProgress;
+
+        this.changeLevelAction = changeLevelAction;
         this.numOfLevels = numOfLevels;
         levels = new ArrayList<>();
+        currentLevel = 1;
+
         levelColumn = new VBox();
-
-        /*stage.setWidth(PANE_WIDTH);
-        stage.setHeight(PANE_HEIGHT);*/
-
-        levelColumn.prefWidthProperty().bind(stage.widthProperty());
-        levelColumn.prefHeightProperty().bind(stage.heightProperty());
+        levelColumn.prefWidthProperty().bind(width);
+        levelColumn.prefHeightProperty().bind(height);
         levelColumn.setMinWidth(PANE_WIDTH);
         levelColumn.setMinHeight(PANE_HEIGHT);
         levelColumn.setSpacing(40);
@@ -51,7 +52,7 @@ public class SelectLevel extends ScrollPane {
 
     private void createLevels(){
         for(int i = 1; i < numOfLevels + 1; i++){
-            LevelItem temp = new LevelItem(i, i > levelProgress, myController);
+            LevelItem temp = new LevelItem(i, i > currentLevel, changeLevelAction);
             temp.prefWidthProperty().bind(levelColumn.widthProperty());
             levels.add(temp);
         }
@@ -59,11 +60,11 @@ public class SelectLevel extends ScrollPane {
         levelColumn.getChildren().addAll(levels);
     }
 
-    public void updateLevelProgress(int levelProgress){
-        this.levelProgress = levelProgress;
+    public void updateLevelProgress(int currentLevel){
+        this.currentLevel = currentLevel;
         for(LevelItem l : levels){
             // if level is less than level progress, set level to unlocked
-            l.setLocked(!(l.getLevel() <= levelProgress));
+            l.setLocked(!(l.getLevel() <= currentLevel));
         }
     }
 

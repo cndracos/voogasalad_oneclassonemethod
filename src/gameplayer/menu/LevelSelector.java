@@ -1,7 +1,10 @@
 package gameplayer.menu;
 
 import java.util.Map;
+import java.util.function.Consumer;
+
 import gameplayer.controller.Controller;
+import gameplayer.controller.GameManager;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
@@ -13,11 +16,11 @@ import javafx.scene.layout.Pane;
  */
 public class LevelSelector extends Menu {
 	private final String MENU_TITLE = "Level";
-	private Controller controller;
+	private Consumer<Integer> changeGameLevel;
 	private int levelCount;
 	
-	public LevelSelector(Controller g) {
-		controller = g;
+	public LevelSelector(Consumer<Integer> changeGameLevel) {
+		this.changeGameLevel = changeGameLevel;
 		this.setText(MENU_TITLE);
 		createLevelMenu();
 	}
@@ -27,13 +30,13 @@ public class LevelSelector extends Menu {
 	 * @param
 	 */
 	public void createLevelMenu() {
-		int numOfLevels = controller.getGameManager().getNumOfLevels();
+		int numOfLevels = GameManager.getNumOfLevels();
 		levelCount = 1;
 		for (int i = 1; i<=numOfLevels; i++) {
 			MenuItem currentMenu = new MenuItem("Level " + levelCount);
 			currentMenu.setOnAction(e->{
 			    		int level = obtainLevelInteger(currentMenu.getText());
-			    		controller.changeGameLevel(level);		    
+			    		changeGameLevel.accept(level);
 			});
 			this.getItems().add(currentMenu);
 			levelCount++;

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * System which calls the AI components' actions if they are within rendering dinstance
  *
- * @author cndracos, fitzj
+ * @author cndracos
  */
 public class ArtificialIntelligence extends AbstractSystem implements  ISystem{
 
@@ -31,6 +31,4 @@ public class ArtificialIntelligence extends AbstractSystem implements  ISystem{
             ai.doAction(components);
         }
     }
-
-
 }

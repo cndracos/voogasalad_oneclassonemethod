@@ -20,15 +20,14 @@ public class FileUploadButton extends Button implements IGamePlayerButton {
 		
 		public FileUploadButton(Stage stage) {
 			myStage = stage;
-			this.setText(BUTTON_NAME);
-			this.setEvent();
+			setText(BUTTON_NAME);
+			setEvent();
 		}
 
 		public void setEvent() {
-			this.setOnAction(E -> {
+			setOnAction(e -> {
 				fileUpload();
 				gameController = new Controller(myStage, gameState);
-				myStage.setScene(gameController.getControllerScene());
 			});
 		}
 
@@ -39,7 +38,7 @@ public class FileUploadButton extends Button implements IGamePlayerButton {
 			Window mainStage = this.getScene().getWindow();
 			File file = fileChooser.showOpenDialog(mainStage);
 	        if (file != null) {
-	        		gameState = DataRead.loadPlayerFile(file);
+	        	gameState = DataRead.loadPlayerFile(file);
 	        }
 	       
 		}

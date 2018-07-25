@@ -25,16 +25,16 @@ public class GameSelectButton extends Button implements IGamePlayerButton{
 	public GameSelectButton(Stage stage, String name, DataGameState currentGameState, Image image) {
 		myGameState = currentGameState;
 		myStage = stage;
-		this.setText(name);
+		setText(name);
 		ImageView gameImage = new ImageView(image);
 		gameImage.setFitHeight(IMAGE_HEIGHT);
 		gameImage.setFitWidth(IMAGE_WIDTH);
-		this.setGraphic(gameImage);
-		this.setEvent();
+		setGraphic(gameImage);
+		setEvent();
 	}
 
 	public void setEvent() {
-		this.setOnAction(e -> {
+		setOnAction(e -> {
 			DataUtils.setGame(myGameState.getGameName());
 			gameController = new Controller(myStage, myGameState);
 		});

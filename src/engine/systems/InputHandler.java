@@ -16,7 +16,7 @@ import javafx.scene.input.KeyCode;
  */
 public class InputHandler extends AbstractSystem implements ISystem {
 
-	private Set<KeyCode> activeCodes;
+	private static Set<KeyCode> activeCodes;
 
 	public InputHandler() {
 		super();
@@ -44,7 +44,7 @@ public class InputHandler extends AbstractSystem implements ISystem {
 	 * Removes code from activeCode list when user releases key
 	 * @param code	Key being released
 	 */
-	public void removeCode(KeyCode code) {
+	public static void removeCode(KeyCode code) {
 		if(activeCodes.contains(code)) {
 			activeCodes.remove(code);
 		}
@@ -54,7 +54,7 @@ public class InputHandler extends AbstractSystem implements ISystem {
 	 * Adds a code to the activeCode list as long as the user is pressing that code
 	 * @param code the key the user is currently pressing
 	 */
-	public void addCode(KeyCode code) {
+	public static void addCode(KeyCode code) {
 		activeCodes.add(code);
 	}
 

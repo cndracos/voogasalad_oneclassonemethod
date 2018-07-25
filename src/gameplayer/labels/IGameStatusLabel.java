@@ -7,7 +7,7 @@ import gameplayer.controller.GameManager;
 
 public interface IGameStatusLabel{
 
-	public double extractGameStateValue(GameManager gameManager);
+	public double extractGameStateValue();
 	
 	public void update(double newValue);
 	

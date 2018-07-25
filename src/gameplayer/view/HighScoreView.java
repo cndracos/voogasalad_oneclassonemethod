@@ -181,7 +181,4 @@ public class HighScoreView extends BranchScreenView {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-	
 }

@@ -1,19 +1,24 @@
 package gameplayer.controller;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
-import authoring.gamestate.Level;
 import data.DataGameState;
 import data.DataRead;
-import engine.components.XPosition;
+import data.DataWrite;
+import engine.exceptions.EngineException;
+import engine.setup.RenderManager;
+import engine.setup.SystemManager;
+import engine.systems.InputHandler;
 import gameplayer.hud.SampleToolBar;
 import gameplayer.levelunlock.SelectLevel;
 import gameplayer.menu.MenuGameBar;
 import gameplayer.menu.PauseMenu;
-import gameplayer.view.GameView;
+import gameplayer.view.LevelModel;
 import gameplayer.view.HighScoreView;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
@@ -21,235 +26,221 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-public class Controller implements IController, LevelController, PlayerController {
-	private static final int WIDTH_SIZE = 800;
-	private static final int HEIGHT_SIZE = 500;
-	private static final int LEVEL_ONE = 1;
-	public static final int FRAMES_PER_SECOND = 60;
-	public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
-	public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
+public class Controller implements LevelController, PlayerController {
+    private static final int WIDTH_SIZE = 800;
+    private static final int HEIGHT_SIZE = 500;
+    private static final int LEVEL_ONE = 1;
+    public static final int FRAMES_PER_SECOND = 60;
+    public static final int MILLISECOND_DELAY = 1000 / FRAMES_PER_SECOND;
+    public static final double SECOND_DELAY = 1.0 / FRAMES_PER_SECOND;
 
-	private double renderTime;
-	private Stage myStage;
-	private Scene gameScene;
-	private Pane gameRoot;
-	private BorderPane myPane;
-	private PauseMenu pauseMenu;
-	private GameView gameView;
-	private SelectLevel levelSelector;
-	private Double playerLifeCount;
+    private Stage myStage;
+    private Pane gameRoot;
+    private BorderPane myPane;
+    private PauseMenu pauseMenu;
 
-	private Map<Integer, Pane> gameLevelDisplays;
-	private DataGameState currentGameState;
-	private SampleToolBar sampleBar;
-	private Map<Integer, Map<String, Boolean>> hudPropMap;
-	private Timeline animation;
-	private String currentGameName;
-	private DataGameState gameState;
-	private GameManager gameManager;
-	private DataGameState initialGameState;
+    private Map<Integer, Pane> gameLevelDisplays;
+    private SampleToolBar sampleBar;
+    private Timeline animation;
+    private String currentGameName;
 
-	public Controller(Stage stage, DataGameState currentGame) {
-		initialGameState = DataRead.copyGame();
-		this.gameState = currentGame;
-//		for (Level l: initialGameState.getGameState().keySet()) {
-//			System.out.println(initialGameState.getGameState().get(l).get(1).get(XPosition.KEY).);
-//			break;
-//		}
-		this.myStage = stage;
-		this.myStage.setWidth(WIDTH_SIZE);
-		this.myStage.setHeight(HEIGHT_SIZE);
-		this.myStage.setResizable(false);
-		this.gameManager = new GameManager(gameState, this);
-		this.myPane = new BorderPane();
-		this.pauseMenu = new PauseMenu(myStage, this);
-		this.levelSelector = new SelectLevel((int) gameState.getLevelProgress(), gameManager.getNumOfLevels(), myStage, this);
-        playerLifeCount = gameManager.getLives();
-		setGameView();
-		openLevelSelector();
-		
-	}
+    private Consumer<Pane> updateScroll;
+    private Consumer<Stage> openLevelSelector;
+    private Consumer<Integer> updateLevel;
+    private Consumer initializeGameView;
 
-	/**
-	 * Opens the level selector
-	 */
-	private void openLevelSelector(){
-		myStage.setScene(levelSelector.getMyScene());
-	}
+    public Controller(Stage stage, DataGameState currentGame) {
+        currentGameName = "Some game"; //TODO have naming a game
 
-	/**
-	 * Initializes controller scene
-	 * @return
-	 */
-	public Scene getControllerScene() {
-		return this.gameScene;
-	}
+        myStage = stage;
+        myStage.setWidth(WIDTH_SIZE);
+        myStage.setHeight(HEIGHT_SIZE);
+        myStage.setResizable(false);
+
+        GameManager.initialize(currentGame);
+        setupWinKeys();
+
+        myPane = new BorderPane();
+
+        Consumer<String> saveGame = (gameName) -> DataWrite.saveGame(currentGame, gameName);
+        initializePauseMenu(saveGame);
+
+        SelectLevel levelSelector = new SelectLevel(GameManager.getNumOfLevels(), myStage.widthProperty(),
+                myStage.heightProperty(), this::changeGameLevel);
+
+        setLevelView(currentGame);
+        updateLevel = levelSelector::updateLevelProgress;
+        openLevelSelector = (e) -> e.setScene(levelSelector.getMyScene());
+        openLevelSelector.accept(myStage);
+    }
+
+    private void setupWinKeys() {
+        GameManager.getWinKeys().forEach((key, value) -> {
+            key.getWinStatus().addListener((o, oldVal, newVal) -> {
+                if (newVal) {
+                    levelWon(value);
+                }
+            });
+        });
+    }
 
 
-	/**
-	 * Restarts the current game
-	 */
-	public void restartGame() {
-		initialGameState = DataRead.copyGame();
-		gameState = initialGameState;
-		this.gameManager = new GameManager(gameState, this);
-		setGameView();
-	}
+    private void initializePauseMenu(Consumer<String> saveGame) {
+        pauseMenu = new PauseMenu(myStage, saveGame, (e) -> {
+            DataGameState restart = DataRead.copyGame();
+            GameManager.initialize(restart);
+            setLevelView(restart);
+        });
+        pauseMenu.setOnShowing((e) -> {
+            try {
+                this.wait();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        });
+        pauseMenu.setOnHidden((e) -> {
+            this.notifyAll();
+        });
+    }
 
-	/**
-	 * Saves game to a file
-	 */
-	public void saveGame(){
-		this.gameView.saveGame();
-	}
-
-	/**
-	 * Method to call when a level has been won and the level selector needs to appear again
-	 * @param level - level won
-	 */
-	public void levelWon(int level){
-		if(level >= this.gameManager.getNumOfLevels()){
-			gameOver();
-		}
-		else{
-			levelSelector.updateLevelProgress(level + 1);
-			openLevelSelector();
-		}
-	}
-
-
-	/**
-	 * Changes the display of the gave.
-	 * @param level to be loaded
-	 */
-	public void changeGameLevel(int level) {
-		this.gameRoot = this.gameLevelDisplays.get(level);
-		this.myPane.setCenter(gameRoot);
-		this.gameView.setActiveLevel(level);
-		this.gameManager.setActiveLevel(level);
-		this.sampleBar.setActiveLevel(level);
-		if (gameScene == null){
-            gameScene = new Scene(myPane, WIDTH_SIZE, HEIGHT_SIZE);
+    /**
+     * Method to call when a level has been won and the level selector needs to appear again
+     *
+     * @param level - level won
+     */
+    public void levelWon(int level) {
+        if (level >= GameManager.getNumOfLevels()) {
+            gameOver();
+        } else {
+            updateLevel.accept(level + 1);
+            openLevelSelector.accept(myStage);
         }
-		initializeGameAnimation();
-		assignKeyInputs();
-		myStage.setScene(gameScene);
-	}
-
-	/**
-	 * Returns the level game display
-	 * @return
-	 */
-	public Map<Integer, Pane> getGameLevelRoot(){
-		return this.gameLevelDisplays;
-	}
-
-	
-	/**
-	 * Returns the gameManager to access information about the game.
-	 * @return
-	 */
-	public GameManager getGameManager() {
-		return gameManager;
-	}
-	
-	/**
-	 * Method that sets the current scene of the game
-	 */
-	private void setGameView() {
-		this.gameView = new GameView(this.gameState, this.gameManager);
-		this.hudPropMap = this.gameView.getHudPropMap();
-		this.gameLevelDisplays = this.gameView.getGameLevelDisplays();
-
-		this.gameRoot = this.gameLevelDisplays.get(LEVEL_ONE);
-		this.myPane.setCenter(this.gameRoot);
-
-		MenuGameBar menuBar = new MenuGameBar(this);
-		this.myPane.setBottom(menuBar);
-
-		this.sampleBar = new SampleToolBar(this.gameManager, this.hudPropMap);
-		this.myPane.setTop(this.sampleBar);
-	}
-
-	/**
-	 * Begins the animation cycle count of the animation after game has started
-	 */
-	private void initializeGameAnimation() {
-		KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY),
-				e -> step(SECOND_DELAY));
-		this.animation = new Timeline();
-		this.animation.setCycleCount(Timeline.INDEFINITE);
-		this.animation.getKeyFrames().add(frame);
-		this.animation.play();
-	}
+    }
 
 
-	public void lifeChange(Double livesLeft){
-		if (livesLeft > 0){
-			gameManager.setLives(livesLeft);
-			gameManager.respawnPlayer();
-		}
-//		else{
-//			gameOver();
-//		}
-	}
-	
-	/**
-	 * Step method that repeats the animation by checking entities using render and system Manager
-	 * @param elapsedTime
-	 */
-	private void step (double elapsedTime) {
-		if (!this.pauseMenu.isShowing()) {
-			this.renderTime+=elapsedTime;
-			this.gameView.execute(elapsedTime);
-			if (this.renderTime>6) {
-				this.gameView.render();
-				this.renderTime = 0;
-			}
-			this.gameManager.setLives(gameManager.getLives());
-			this.gameView.updateScroll(this.gameRoot);
-			this.sampleBar.updateGameStatusLabels(this.gameManager);
-		}
-	}
+    /**
+     * Method that sets the current scene of the game
+     */
+    private void setLevelView(DataGameState gameState) {
+        LevelModel levelModel = new LevelModel(gameState);
+        gameLevelDisplays = levelModel.getGameLevelDisplays();
+
+        gameRoot = gameLevelDisplays.get(LEVEL_ONE);
+        myPane.setCenter(this.gameRoot);
+
+        updateScroll = levelModel::updateScroll;
+        initializeGameView = (e) -> levelModel.initializeLevelView();
+
+        MenuGameBar menuBar = new MenuGameBar(this::changeGameLevel);
+        myPane.setBottom(menuBar);
+
+        sampleBar = new SampleToolBar(levelModel.getHudPropMap());
+        myPane.setTop(sampleBar);
+    }
 
 
-	/**
-	 * Passes keys to engine and assigns escape key to pause menu
-	 */
-	private void assignKeyInputs() {
-		this.gameScene.setOnKeyPressed(e -> {
-			if(e.getCode() == KeyCode.ESCAPE) {
-				pauseMenu.show(myStage);
-			} 
-			else if(e.getCode() == KeyCode.H) {
-				gameOver();
-			}
-			else {
-				if(gameView != null) {
-					gameView.setInput(e.getCode());
-				}
-			}
-		});
-		this.gameScene.setOnKeyReleased(e -> {
-			if(e.getCode() != KeyCode.ESCAPE) {
-				if(this.gameView != null) {
-					this.gameView.removeInput(e.getCode());
-				}
-			}
-		});
-	}
-	/**
-	 * Shows the high score screen
-	 */
-	private void gameOver(){
-		System.out.println(gameManager.getNumOfLevels());
-		System.out.println(gameManager.getActiveLevel());
-		HighScoreView highScoreScreen = new HighScoreView(myStage);
-		highScoreScreen.setScore(100.0); //change to game's score
-		highScoreScreen.setGameName(currentGameName);
-		myStage.setScene(highScoreScreen.getScene());
-	}
+    /**
+     * Changes the display of the gave.
+     *
+     * @param level to be loaded
+     */
+    public void changeGameLevel(int level) {
+        gameRoot = gameLevelDisplays.get(level);
+        myPane.setCenter(gameRoot);
+
+        GameManager.setActiveLevel(level);
+        initializeGameView.accept(null);
+        sampleBar.setActiveLevel(level);
+
+        Scene gameScene = new Scene(myPane, WIDTH_SIZE, HEIGHT_SIZE);
+
+        initializeGameAnimation();
+        assignKeyInputs(gameScene);
+        myStage.setScene(gameScene);
+    }
+
+    /**
+     * Begins the animation cycle count of the animation after game has started
+     */
+    private void initializeGameAnimation() {
+        KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY),
+                e -> step(SECOND_DELAY));
+        animation = new Timeline();
+        animation.setCycleCount(Timeline.INDEFINITE);
+        animation.getKeyFrames().add(frame);
+        startRendering(SECOND_DELAY);
+        animation.play();
+    }
+
+    /**
+     * Step method that repeats the animation by checking entities using render and system Manager
+     *
+     * @param elapsedTime
+     */
+    private void step(double elapsedTime) {
+        try {
+            SystemManager.execute(elapsedTime);
+        } catch (EngineException e) {
+            e.printStackTrace();
+        }
+        updateScroll.accept(gameRoot);
+        sampleBar.updateGameStatusLabels();
+    }
+
+    private void startRendering(double timeStep) {
+        Thread t = new Thread(new RenderManager(timeStep, Math.max(WIDTH_SIZE, HEIGHT_SIZE)));
+        EventHandler event = pauseMenu.getOnShowing();
+        pauseMenu.setOnShowing((e) -> {
+            event.handle(e);
+            try {
+                t.wait();
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+        });
+        t.start();
+    }
 
 
+    /**
+     * Passes keys to engine and assigns escape key to pause menu
+     */
+    private void assignKeyInputs(Scene gameScene) {
+        gameScene.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                pauseMenu.show(myStage);
+            } else if (e.getCode() == KeyCode.H) {
+                gameOver();
+            } else {
+                {
+                    InputHandler.addCode(e.getCode());
+                }
+            }
+        });
+        gameScene.setOnKeyReleased(e -> {
+            if (e.getCode() != KeyCode.ESCAPE) {
+                InputHandler.removeCode(e.getCode());
+            }
+        });
+    }
+
+    /**
+     * Shows the high score screen
+     */
+    private void gameOver() {
+        HighScoreView highScoreScreen = new HighScoreView(myStage);
+        highScoreScreen.setScore(GameManager.getScore());
+        highScoreScreen.setGameName(currentGameName);
+        myStage.setScene(highScoreScreen.getScene());
+    }
+
+
+    //TODO find a place to implement this
+    public void lifeChange(Integer livesLeft) {
+        if (livesLeft > 0) {
+            GameManager.setLives(livesLeft);
+            GameManager.respawnPlayer();
+        }
+    }
 
 }

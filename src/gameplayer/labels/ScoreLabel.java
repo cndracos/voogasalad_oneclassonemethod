@@ -18,8 +18,8 @@ public class ScoreLabel extends Label implements IGameStatusLabel{
 
 
 	@Override
-	public double extractGameStateValue(GameManager gameManager) {
-		return gameManager.getScore(); 
+	public double extractGameStateValue() {
+		return GameManager.getScore();
 	}
 
 	@Override

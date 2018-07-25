@@ -38,7 +38,7 @@ public class VelocityLabel extends Label implements IGameStatusLabel {
 	}
 
 	@Override
-	public double extractGameStateValue(GameManager gameManager) {
+	public double extractGameStateValue() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

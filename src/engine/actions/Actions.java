@@ -2,14 +2,12 @@ package engine.actions;
 
 import authoring.entities.Entity;
 import authoring.gamestate.GameState;
-import data.DataGameState;
 import engine.components.*;
 import engine.components.presets.FireballCollision;
 
 import java.awt.Point;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +17,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import engine.setup.SystemManager;
-import engine.systems.collisions.CollisionDirection;
 
 /**
  * This is the actions class which contains methods that represent any in-game actions done by an entity outside of
@@ -32,18 +29,13 @@ import engine.systems.collisions.CollisionDirection;
  * @author Yameng Liu
  */
 public class Actions {
-    private static SystemManager sm = null;
-
-    public static void setSM(SystemManager sman) {
-    	sm = sman;
-    }
 
     public static Consumer<Map<String,Component>> remove() {
     	return e1 -> {
     		if(e1.containsKey(Sprite.KEY)) {
     			Sprite s = (Sprite) e1.get(Sprite.KEY);
     			s.getImage().toBack();
-    			sm.removeEntity(s.getPID(), e1);
+    			SystemManager.removeEntity(s.getPID());
     		}
     	};
     }
@@ -97,8 +89,8 @@ public class Actions {
     				}
     			}
     			
-    			sm.addEntity(id, ne);
-    			sm.setActives();
+    			SystemManager.addEntity(id, ne);
+    			SystemManager.setActives();
     		}
     	};
     }
@@ -149,18 +141,12 @@ public class Actions {
 					}
 				}
 
-				sm.addEntity(id, ne);
-				sm.setActives();
+				SystemManager.addEntity(id, ne);
+				SystemManager.setActives();
 			}
 		};
 	}
-    
-    
-    /**
 
-     * @return left action
-     */
-	@SuppressWarnings("unchecked")
 	public static Consumer<Map<String, Component>> moveLeft (double speed) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -171,11 +157,7 @@ public class Actions {
     		}
     	};
     }
-	
-	
-	
-	
-	@SuppressWarnings("unchecked")
+
 	public static Consumer<Map<String, Component>> moveRight (double speed) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -186,8 +168,7 @@ public class Actions {
     		}
     	};
     }
-	
-	@SuppressWarnings("unchecked")
+
 	public static Consumer<Map<String, Component>> moveUp (double speed) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -198,8 +179,7 @@ public class Actions {
     		}
     	};
     }
-	
-	@SuppressWarnings("unchecked")
+
 	public static Consumer<Map<String, Component>> moveDown (double speed) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -210,9 +190,7 @@ public class Actions {
     		}
     	};
     }
-	
-	
-	@SuppressWarnings("unchecked")
+
 	public static Consumer<Map<String, Component>> accelerateLeft (double speed) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -223,8 +201,7 @@ public class Actions {
     		}
     	};
     }
-	
-	@SuppressWarnings("unchecked")
+
 	public static Consumer<Map<String, Component>> accelerateRight (double speed) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -236,7 +213,6 @@ public class Actions {
     	};
     }
 
-	@SuppressWarnings("unchecked")
 	public static Consumer<Map<String, Component>> accelerateUp (double speed) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -247,8 +223,7 @@ public class Actions {
     		}
     	};
     }
-	
-	@SuppressWarnings("unchecked")
+
 	public static Consumer<Map<String, Component>> accelerateDown (double speed) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -259,10 +234,7 @@ public class Actions {
     		}
     	};
     }
-	
-	
-	
-	@SuppressWarnings("unchecked")
+
 	public static Consumer<Map<String, Component>> addScore (double score) {
     	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
     		if(actor != null && (actor instanceof Map<?,?>)) {
@@ -274,8 +246,6 @@ public class Actions {
     	};
     }
 
-	
-	@SuppressWarnings("unchecked")
 	public static BiConsumer<Map<String, Component>,Map<String, Component>> checkWin() {
 		return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
     		if(actor1 != null && (actor1 instanceof Map<?,?>) && actor2 != null && (actor2 instanceof Map<?,?>)) {
@@ -287,21 +257,19 @@ public class Actions {
     		}
     	};
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public static BiConsumer<Map<String, Component>,Map<String, Component>> HeightPowerUp() {
 		return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
     		if(actor1 != null && (actor1 instanceof Map<?,?>) && actor2 != null && (actor2 instanceof Map<?,?>)) {
     			if(actor2.containsKey(Player.KEY) && actor2.containsKey(Height.KEY)) {
     				Height h = (Height) actor2.get(Height.KEY);
     				h.setData(h.getData()*1.5);
-    			    sm.removeEntity(actor1.get(EntityType.KEY).getPID(),actor1);
+    			    SystemManager.removeEntity(actor1.get(EntityType.KEY).getPID());
     		    }
     	   }
 	   };
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public static BiConsumer<Map<String, Component>,Map<String, Component>> transferScore() {
 		return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
     		if(actor1 != null && (actor1 instanceof Map<?,?>) && actor2 != null && (actor2 instanceof Map<?,?>)) {
@@ -315,9 +283,7 @@ public class Actions {
     		}
     	};
 	}
-	
-	
-	@SuppressWarnings("unchecked")
+
 	public static BiConsumer<Map<String, Component>,Map<String, Component>> accelerateUpCollision(double acc) {
 		return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
 			if(actor1 != null && (actor1 instanceof Map<?,?>) && actor2 != null && (actor2 instanceof Map<?,?>)) {
@@ -328,10 +294,7 @@ public class Actions {
 			}
 		};
 	}
-	
-	
-	
-	@SuppressWarnings("unchecked")
+
 	public static BiConsumer<Map<String, Component>,Map<String, Component>> xFriction(double stickiness) {
 		return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
     		if(actor1 != null && (actor1 instanceof Map<?,?>)) {
@@ -351,8 +314,6 @@ public class Actions {
     	};
 	}
 
-
-	@SuppressWarnings("unchecked")
 	public static Consumer<Map<String, Component>> yGravity(double force){
 		return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
 			if (actor != null && actor.containsKey(YAcceleration.KEY)) {
@@ -361,8 +322,7 @@ public class Actions {
 			}
 		};
 	}
-    
-	
+
     /**
 	 *
 	 * This is the main action which deals with components damaging one another. This method will be given
@@ -372,7 +332,6 @@ public class Actions {
 	 *
      * @return Damage action
      */
-    @SuppressWarnings("unchecked")
 	public static BiConsumer<Map<String, Component>, Map<String, Component>> damage(){
         return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
 			if (actor1.containsKey(EntityType.KEY) && actor2.containsKey(EntityType.KEY)) {
@@ -387,34 +346,8 @@ public class Actions {
 //			System.out.println("11"+((DamageValue)actor1.get(DamageValue.KEY)).getData());
 		};
     }
-    
-    @SuppressWarnings("unchecked")
-    public static BiConsumer<Map<String,Component>, Map<String,Component>> Ystop(){
-      	return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
-    		if(actor1.containsKey(YVelocity.KEY) && !actor2.containsKey(YVelocity.KEY)) {
-   
-    			YVelocity yv =(YVelocity) actor1.get(YVelocity.KEY);
-    			yv.setData(0);
-    		 }
-      	};    	
-    	
-    }
-    @SuppressWarnings("unchecked")
-    public static BiConsumer<Map<String,Component>, Map<String,Component>> Xstop(){
-      	return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
-    		if(actor1.containsKey(XVelocity.KEY) && !actor2.containsKey(XVelocity.KEY)) {
-    			XVelocity xv = (XVelocity) actor1.get(XVelocity.KEY);
-    			xv.setData(0);
-    		 }
-      	};    	
-    	
-    }
-    
-    
-   
-   
-    	
-    private static void giveDamage(Map<String, Component> player, Map<String, Component> collider) {
+
+	private static void giveDamage(Map<String, Component> player, Map<String, Component> collider) {
 		if (player.containsKey(DamageValue.KEY) &&
 				player.containsKey(DamageLifetime.KEY) &&
 				collider.containsKey(Health.KEY)) {
@@ -428,26 +361,31 @@ public class Actions {
 			Map<String, Component> newDamageComponents = new HashMap<>();
 			newDamageComponents.put(DamageValue.KEY, new DamageValue(playerID, dlv.getData()));
 			newDamageComponents.put(DamageLifetime.KEY, new DamageLifetime(playerID, dll.getData()));
-			if(sm != null) {
-				sm.addEntity(colliderID, newDamageComponents); //passes new damage to the HealthDamage system
-			}
+
+			SystemManager.addEntity(colliderID, newDamageComponents); //passes new damage to the HealthDamage system
 		}
 	}
 
-    /**
-     * @return two new entity maps
-     */
-    
-    // Behavior already supported in sprite class
-    
-    /*@SuppressWarnings("unchecked")
-	public Consumer<Map<String, Component>> changeSprite(Sprite alternative){
-        return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
-            if(actor != null && actor.containsKey(Sprite.KEY)){
-                actor.put(Sprite.KEY, alternative);
-            }
-        };
-    }*/
+    public static BiConsumer<Map<String,Component>, Map<String,Component>> Ystop(){
+      	return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
+    		if(actor1.containsKey(YVelocity.KEY) && !actor2.containsKey(YVelocity.KEY)) {
+   
+    			YVelocity yv =(YVelocity) actor1.get(YVelocity.KEY);
+    			yv.setData(0);
+    		 }
+      	};    	
+    	
+    }
+
+    public static BiConsumer<Map<String,Component>, Map<String,Component>> Xstop(){
+      	return (Serializable & BiConsumer<Map<String, Component>,Map<String, Component>>) (actor1, actor2) -> {
+    		if(actor1.containsKey(XVelocity.KEY) && !actor2.containsKey(XVelocity.KEY)) {
+    			XVelocity xv = (XVelocity) actor1.get(XVelocity.KEY);
+    			xv.setData(0);
+    		 }
+      	};    	
+    	
+    }
 
 	/**
 	 *
@@ -496,14 +434,11 @@ public class Actions {
 		};
 	}
 
-
     /**
      * This would be an AI component that has an enemy follow you
      * @param fInt Player/entity being followed
      * @return action which result in the tracker moving towards the followed
      */
-
-    @SuppressWarnings("unchecked")
 	public static Consumer<Map <String, Component>> followsYou (int fInt, double speed) {
 		Entity  followed = null;
 		try {
@@ -552,41 +487,6 @@ public class Actions {
 			setNewDestination(coordinates, destination, current, xp, yp);
 		};
     }
-	/**
-	 * The patrol method that uses the user's position as a starting point, so any list of points can define
-	 * an entity-specific patrol route.
-	 *
-	 * @param coordinates Destination points
-	 * @param speed which you move at
-	 * @return action of patrolling
-	 */
-	private static Consumer<Map <String, Component>> patrolRelative(List<Point> coordinates, double speed) {
-    	AtomicReference<Point> destination = new AtomicReference<>(coordinates.get(0));
-    	AtomicInteger current = new AtomicInteger();
-		final boolean[] shifted = {false};
-
-    	return (Serializable & Consumer<Map<String, Component>>) (actor) -> {
-			XVelocity xv = (XVelocity) actor.get(XVelocity.KEY);
-			YVelocity yv = (YVelocity) actor.get(YVelocity.KEY);
-			XPosition xp = (XPosition) actor.get(XPosition.KEY);
-			YPosition yp = (YPosition) actor.get(YPosition.KEY);
-
-			if (!shifted[0]) {
-				double xDiff =  destination.get().getX() - xp.getData();
-				double yDiff = destination.get().getY() - yp.getData();
-				for (Point p : coordinates) {
-					p.setLocation(p.getX() - xDiff, p.getY() - yDiff);
-				}
-				shifted[0] = true;
-			}
-
-			xv.setData((destination.get().getX()-xp.getData())/
-					(distance(xp.getData(), yp.getData(), destination.get().getX(), destination.get().getY())) * speed);
-			yv.setData((destination.get().getY()-yp.getData())/
-					(distance(xp.getData(), yp.getData(), destination.get().getX(), destination.get().getY())) * speed);
-			setNewDestination(coordinates, destination, current, xp, yp);
-		};
-	}
 
 	private static void setNewDestination(List<Point> coordinates, AtomicReference<Point> destination, AtomicInteger current, XPosition xp, YPosition yp) {
 		if ((distance(xp.getData(), yp.getData(), destination.get().getX(), destination.get().getY())) < 10) {

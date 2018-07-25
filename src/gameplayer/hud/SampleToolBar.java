@@ -21,7 +21,6 @@ public class SampleToolBar extends ToolBar{
 	private Map<String, Boolean> listOfStatusLabels;
 	private List<IGameStatusLabel> labelsToDisplay;
 	private List<String> approvedLabels;
-	private GameManager gameManager;
 	private Map<Integer, Map<String, Component>> playerKeys;
 	private static int HBOX_LENGTH = 120;
 	Map<Integer, Map<String, Boolean>> hudPropMap;
@@ -30,12 +29,11 @@ public class SampleToolBar extends ToolBar{
 	/**
 	 * Builds a Sample Tool Bar that acts as the HUD for the game
 	 */
-	public SampleToolBar(GameManager gamemanager, Map<Integer, Map<String, Boolean>> HUDPropMap) {
-		gameManager = gamemanager;
+	public SampleToolBar(Map<Integer, Map<String, Boolean>> HUDPropMap) {
 		hudPropMap = HUDPropMap;
-		playerKeys = gameManager.getPlayerKeys();
+		playerKeys = GameManager.getPlayerKeys();
 		
-		setActiveLevel(gameManager.getActiveLevel());
+		setActiveLevel(GameManager.getActiveLevel());
 	}	
 	
 
@@ -52,9 +50,9 @@ public class SampleToolBar extends ToolBar{
 	/**
 	 * Update the gameState Values using the gameManager values
 	 */
-	public void updateGameStatusLabels(GameManager gameManager) {
+	public void updateGameStatusLabels() {
 		for (IGameStatusLabel label : labelsToDisplay) {
-			label.update(label.extractGameStateValue(gameManager));
+			label.update(label.extractGameStateValue());
 		}
 	}
 

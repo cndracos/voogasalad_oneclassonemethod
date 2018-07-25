@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import engine.systems.ISystem;
-import gameplayer.view.EntityManager;
 import engine.components.Component;
 import engine.exceptions.EngineException;
 
@@ -20,17 +19,10 @@ import engine.exceptions.EngineException;
  */
 public class SystemManager {
 
-    private List<ISystem> systems;
-    private RenderManager renderManager;
-    private EntityManager ec;
-    
-    public SystemManager (RenderManager renderManager, EntityManager ec) {
-        this.renderManager = renderManager;
-        this.ec = ec;
-    }
+    private static List<ISystem> systems;
 
-    public void addSystems(List<ISystem> systems) {
-    		this.systems = systems;
+    public static void addSystems(List<ISystem> newSystems) {
+        systems = newSystems;
     }
 
     /**
@@ -39,23 +31,21 @@ public class SystemManager {
      * @param pid the entity's ID
      * @param components its components
      */
-    public void addEntity(int pid, Map<String, Component> components) {
+    public static void addEntity(int pid, Map<String, Component> components) {
         for (ISystem s : systems) {
             s.addComponent(pid, components);
         }
-        ec.addEntity(pid, components);
     }
 
-    public void removeEntity (int pid, Map<String,Component> components) {
+    public static void removeEntity(int pid) {
         for (ISystem s : systems) {
             s.removeComponent(pid);
         }
-        setActives(renderManager.render());
-        ec.removeEntity(pid, components);
+        setActives(RenderManager.render());
     }
 
 
-    public void addComponent(int pid, Component c) {
+    public static void addComponent(int pid, Component c) {
         Map<String, Component> newComponent = new HashMap<>();
         newComponent.put(c.getKey(), c);
         for(ISystem s : systems) {
@@ -63,27 +53,23 @@ public class SystemManager {
 		}
     }
 
-   /* public void removeComponent(int pid) {
-        removeEntity(pid);
-    }*/
-
     /**
      * Sets the active components for the systems to act upon based on the rendering
      * @param actives set of active components within rendering distance
      */
-    public void setActives (Set<Integer> actives) {
+    public static void setActives (Set<Integer> actives) {
         for (ISystem s : systems) {
             s.setActives(actives);
         }
     }
 
-    public void execute (double time) throws EngineException {
+    public static void execute (double time) throws EngineException {
         for (ISystem s: systems) {
             s.execute(time);
         }
     }
 
-	public void setActives() {
+	public static void setActives() {
 		for(ISystem s : systems) {
 			s.setActives();
 		}

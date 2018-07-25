@@ -1,1 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entity game="l" name="q"><Sprite>braun.png</Sprite><Name>q</Name><Type>Block</Type><Health>100.0</Health></Entity>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entity game="exampleGame" name="q"><Name>q</Name><Type>Block</Type><Sprite>no_image.jpg</Sprite></Entity>

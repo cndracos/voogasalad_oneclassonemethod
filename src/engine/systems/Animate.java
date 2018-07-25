@@ -74,7 +74,7 @@ public class Animate extends AbstractSystem implements ISystem {
     public void removeComponent(int pid) {
         if (this.getHandled().containsKey(pid)) {
             Sprite s = (Sprite) this.getHandled().get(pid).get(Sprite.KEY);
-            s.getImage().setX(10000);
+            s.remove();
         }
         this.getHandled().remove(pid);
     }

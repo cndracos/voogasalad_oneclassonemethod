@@ -1,6 +1,7 @@
 package engine.components;
 
 import java.io.FileNotFoundException;
+import java.util.function.Consumer;
 
 
 import data.DataRead;
@@ -12,6 +13,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import javafx.animation.Animation;
 import javafx.scene.image.ImageView;
 
+
 /**
  * Sprite component containing an image. Constructor and setter throw file not found if the filepath is incorrect.
  * Allows for animation with a special system tool. Animation system calls the sprite's animate method to do this.
@@ -20,7 +22,8 @@ import javafx.scene.image.ImageView;
 public class Sprite extends SingleStringComponent implements Component, StringComponent, ReadStringComponent {
 
 	private String name;
-	
+	private Consumer removeAction;
+
 	public static final String KEY = "Sprite";
 	
 	/**
@@ -65,13 +68,6 @@ public class Sprite extends SingleStringComponent implements Component, StringCo
 	
 	/**
 	 * Animates sprite using a Sprite Transition, a kind of animation that changes the image's viewport.
-	 * @param time		Total time for animation (one cycle through sprite sheet)
-	 * @param total		Total number of images on sprite sheet
-	 * @param columns	Number of columns of sprite sheet
-	 * @param x			x offset of sprite sheet - should be made to be 0 normally
-	 * @param y			y offset of sprite sheet - should be made to be 0 normally
-	 * @param w			Width of each image on sprite sheet
-	 * @param h			Height of each image on sprite sheet
 	 * @throws EngineException 
 	 */
 	public void animate(String file) throws EngineException {
@@ -105,6 +101,14 @@ public class Sprite extends SingleStringComponent implements Component, StringCo
 	 */
 	public boolean isPlaying() {
 		return isPlaying;
+	}
+
+	public void setOnImageRemoved(Consumer action) {
+		this.removeAction = action;
+	}
+
+	public void remove() {
+		removeAction.accept(null);
 	}
 	
 	public String getKey() {

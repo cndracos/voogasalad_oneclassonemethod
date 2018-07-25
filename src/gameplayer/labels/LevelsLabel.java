@@ -16,8 +16,8 @@ public class LevelsLabel extends Label implements IGameStatusLabel{
 	}
 
 	@Override
-	public double extractGameStateValue(GameManager gameManager) {
-		return gameManager.getActiveLevel();
+	public double extractGameStateValue() {
+		return GameManager.getActiveLevel();
 	}
 
 	@Override

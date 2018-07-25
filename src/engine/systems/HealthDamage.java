@@ -18,11 +18,8 @@ import engine.setup.SystemManager;
  */
 public class HealthDamage extends AbstractSystem implements ISystem {
 
-	private SystemManager sm;
-	
-	public HealthDamage(SystemManager sm) {
+	public HealthDamage() {
 		super();
-		this.sm = sm;
 	}
 
 	public void addComponent(int pid, Map<String, Component> components) {
@@ -50,10 +47,10 @@ public class HealthDamage extends AbstractSystem implements ISystem {
 			if(l.getData()>=0) {
 				h.resetHealth();
 			} else {
-			   sm.removeEntity(key, map);
+			   SystemManager.removeEntity(key);
 			}
 		} else {
-			sm.removeEntity(key, map);
+			SystemManager.removeEntity(key);
 		}
 	}
 	

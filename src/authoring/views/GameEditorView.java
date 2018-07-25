@@ -120,7 +120,7 @@ public class GameEditorView extends BorderPane implements AuthoringPane{
 	}
 
 	/**
-	 * Creates a new LevelView
+	 * Creates a new LevelModel
 	 */
 	public void addLevel(){
 		try {
@@ -155,7 +155,7 @@ public class GameEditorView extends BorderPane implements AuthoringPane{
 				levelTabsList.remove(t);
 				updateTabs.accept(levelTabsList);
 			});
-			// ((LevelView) t.getContent()).setLanguage(language);
+			// ((LevelModel) t.getContent()).setLanguage(language);
 			tabPane.getTabs().add(t);
 		} catch (Exception e) {
 			throw new AuthoringException(Level.ERROR_MESSAGE, AuthoringAlert.SHOW);
@@ -178,9 +178,9 @@ public class GameEditorView extends BorderPane implements AuthoringPane{
 	}
 
 	/**
-	 * Creates a new LevelView based on an existing LevelView
+	 * Creates a new LevelModel based on an existing LevelModel
 	 * @param l Level to be added to current view
-	 * @return LevelView object just instantiated
+	 * @return LevelModel object just instantiated
 	 */
 	public LevelView loadLevel(Level l){
 		levelTabsList.add(new Tab());
@@ -329,7 +329,7 @@ public class GameEditorView extends BorderPane implements AuthoringPane{
 	}
 
 	/**
-	 * Adds an entity to the LevelView
+	 * Adds an entity to the LevelModel
 	 * @param mouseEvent
 	 */
 	private void addEntityMethod(MouseEvent mouseEvent) {
@@ -370,7 +370,7 @@ public class GameEditorView extends BorderPane implements AuthoringPane{
 		toolbar.setLanguage(language);
 		for(Tab t : tabPane.getTabs()) {
 			t.setText(language.getProperty("Level")+ " " + (tabPane.getTabs().indexOf(t)+1)) ;
-			// ((LevelView) t.getContent()).setLanguage(language);
+			// ((LevelModel) t.getContent()).setLanguage(language);
 		}
 
 	}

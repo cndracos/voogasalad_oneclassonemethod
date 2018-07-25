@@ -17,6 +17,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception{
 		SplashScreenView splashScreen = new SplashScreenView(primaryStage);
+
 		mainStage = primaryStage;
 		mainStage.setTitle(TITLE);
 		mainStage.setScene(splashScreen.getScene());

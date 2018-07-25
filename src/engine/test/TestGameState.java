@@ -282,8 +282,7 @@ public class TestGameState {
 //		//entities.put(1, mario2);
 //		//entities.put(2, mario3);
 //		//entities.put(3, mario4);
-		GameInitializer gi = new GameInitializer(entities, 300, 50, 50, null);
-		ih = gi.getInputHandler();
+		GameInitializer.initializeNewGame(entities, 50, 50);
 		//eng = new InternalEngine(gi.getSystems());
 
 		Map<Level, Map<Integer,Map<String,Component>>> state = new HashMap<>();

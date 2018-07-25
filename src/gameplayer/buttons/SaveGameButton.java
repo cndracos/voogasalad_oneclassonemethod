@@ -2,6 +2,8 @@ package gameplayer.buttons;
 import gameplayer.menu.PauseMenu;
 import javafx.scene.control.Button;
 
+import java.util.function.Consumer;
+
 /**
  * Button that saves the current state of the game
  * @author Ryan
@@ -10,10 +12,10 @@ import javafx.scene.control.Button;
 public class SaveGameButton extends Button implements IGamePlayerButton{
 	
 	private final String BUTTON_NAME = "Save Game";
-	private PauseMenu pauseMenu;
+	private Consumer saveGame;
 	
-	public SaveGameButton(PauseMenu p) {
-		pauseMenu = p;
+	public SaveGameButton(Consumer saveGame) {
+		this.saveGame = saveGame;
 		this.setText(BUTTON_NAME);
 		this.setOnAction(e -> setEvent());
 	}
@@ -22,6 +24,6 @@ public class SaveGameButton extends Button implements IGamePlayerButton{
 	 * Saves the Current State of the Game
 	 */
 	public void setEvent() {
-		 pauseMenu.saveGame();
+		 saveGame.accept(null);
 	}
 }

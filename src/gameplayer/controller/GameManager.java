@@ -2,181 +2,103 @@ package gameplayer.controller;
 
 import authoring.gamestate.Level;
 import data.DataGameState;
-import data.DataRead;
 import engine.components.*;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * GameManager extracts all of the information needed to manage updating the state of the game by Controller and GameView
+ * GameManager extracts all of the information needed to manage updating the state of the game by Controller and LevelModel
  * @author Scott Pledger
  */
 public class GameManager {
-	private Map<Integer, Map<String, Component>> playerKeys;
-	private Map<Win, Integer> winKeys;
-	private int activeLevel;
-	private XPosition activePlayerPosX;
-	private YPosition activePlayerPosY;
-	private int numOfLevels;
-	private double lifeCount;
-	private double levelProgress;
-	private PlayerController myController;
-	private Integer lifeEntityID;
-	private Map<Level, Map<Integer, Map<String, Component>>> levelMap;
-	private Map<Integer, Integer> levelToPlayer;
-	private int levelCount;
-	private Double lives;
-	private DoubleProperty numOfLives;
-	private Map<Integer, Double> startingXPositionMap;
-	private Map<Integer, Double> startingYPositionMap;
+	private static Map<Integer, Map<String, Component>> playerKeys;
+	private static Map<Win, Integer> winKeys;
+
+	private static int activeLevel;
+	private static XPosition activePlayerPosX;
+	private static YPosition activePlayerPosY;
+
+	private static int numOfLevels;
+	private static Map<Integer, Integer> livesMap;
+
+	private static Map<Level, Map<Integer, Map<String, Component>>> levelMap;
+
+	private static Map<Integer, Double> startingXPositionMap;
+	private static Map<Integer, Double> startingYPositionMap;
 
     private static final int FIRST_LEVEL = 1;
 
-    public GameManager(DataGameState gameState, PlayerController controller){
+    public static void initialize(DataGameState gameState){
         levelMap = gameState.getGameState();
-        levelToPlayer = new HashMap<>();
+
 		startingXPositionMap = new HashMap<>();
 		startingYPositionMap = new HashMap<>();
+		livesMap = new HashMap<>();
         playerKeys = new HashMap<>();
         winKeys = new HashMap<>();
-        levelProgress = gameState.getLevelProgress();
-        myController = controller;
-        levelCount = 1;
-        for(Level level : levelMap.keySet()){
-            extractInfo(levelMap.get(level), level.getLevelNum());
-        }
+
+        levelMap.forEach((key, value) -> {
+            extractInfo(value, key.getLevelNum());
+        });
 
         setActiveLevel(FIRST_LEVEL);
-
-        //lifeCount.addListener((o, oldVal, newVal) -> controller.liveChange((int) newVal));
-
         numOfLevels = levelMap.keySet().size();
-        if(winKeys.keySet().size() > 0){
-            for(Win w : winKeys.keySet()){
-                w.getWinStatus().addListener((o, oldVal, newVal) -> {
-                    if(newVal){
-                        myController.levelWon(winKeys.get(w));
-                    }
-                });
-            }
-        }
-
-        numOfLives.addListener((o, oldVal, newVal) -> {
-            myController.lifeChange(newVal.doubleValue());
-        });
     }
-
-
-	private Map<Integer, Map<String, Component>> getEntitiesForSingleLevel(Map<Level, Map<Integer, Map<String, Component>>> levelMap, int levelNum){
-		int count = 1;
-		Map<Integer, Map<String, Component>> entityMapForSingleLevel = new HashMap<>();;
-		for (Level l: levelMap.keySet()) {
-			if (count == levelNum) {
-				entityMapForSingleLevel = levelMap.get(l);
-			}
-			count++;
-		}
-		return entityMapForSingleLevel;
-	}
     
 	/**
 	 * Extracts player and win components from each level
 	 * @param entities
 	 * @param levelNum
 	 */
-	private void extractInfo(Map<Integer, Map<String, Component>> entities, int levelNum){
-		Map<String, Component> entityComponents;
-		for(Integer i : entities.keySet()) {
-			entityComponents = entities.get(i);
-			if(entityComponents.containsKey(Sprite.KEY)) {
-				if(entityComponents.containsKey(Player.KEY)){
-					playerKeys.put(levelNum, entityComponents);
+	private static void extractInfo(Map<Integer, Map<String, Component>> entities, int levelNum){
+		entities.forEach((key, value) -> {
+            if (value.containsKey(Player.KEY)) {
+                playerKeys.put(levelNum, value);
+                livesMap.put(levelNum, (int) ((Lives) value.get(Lives.KEY)).getData());
+                //we know player must have x/y coordinates (for now)
+                startingXPositionMap.put(levelNum, ((XPosition) value.get(XPosition.KEY)).getData());
+                startingYPositionMap.put(levelNum, ((YPosition) value.get(YPosition.KEY)).getData());
+            }
 
-					Map<Integer, Map<String, Component>> initialGameState = getEntitiesForSingleLevel(DataRead.copyGame().getGameState(),levelNum);
-					if (initialGameState.get(i).containsKey(XPosition.KEY)) {     
-						System.out.println(((XPosition) initialGameState.get(i).get(XPosition.KEY)).getData());
-						startingXPositionMap.put(levelNum,((XPosition) initialGameState.get(i).get(XPosition.KEY)).getData());
-					}
-					if (initialGameState.get(i).containsKey(YPosition.KEY)) {   
-						System.out.println(((YPosition) initialGameState.get(i).get(YPosition.KEY)).getData());
-						startingYPositionMap.put(levelNum,((YPosition) initialGameState.get(i).get(YPosition.KEY)).getData());
-					}
-				}
-				if (entityComponents.containsKey(Win.KEY)) {
-					winKeys.put((Win) entityComponents.get(Win.KEY), levelNum);
-				}
-				//obtaining starting values for each level.
-
-				if(entityComponents.containsKey(Lives.KEY)) {
-					lifeEntityID = i;
-					levelToPlayer.put(levelNum, lifeEntityID);
-					//lifeCount = ((Lives) entityComponents.get(Lives.KEY)).getData();
-				}
-			}
-		}
+            if (value.containsKey(Win.KEY)) {
+                winKeys.put((Win) value.get(Win.KEY), levelNum);
+            }
+		});
 	}
-
-    public DoubleProperty livesSetup(){
-        DoubleProperty temp = new SimpleDoubleProperty();
-        for (Integer i : playerKeys.keySet()) {
-            /*if (levelMap.get(l).get(levelToPlayer.get(activeLevel)).containsKey(Lives.KEY)) {
-                temp = ((Lives) levelMap.get(l).get(levelToPlayer).get(Lives.KEY)).getLives();*/
-            if(playerKeys.get(i).containsKey(Lives.KEY)) {
-                //lifeCount = ((Lives) levelMap.get(l).get(levelToPlayer.get(activeLevel)).get(Lives.KEY)).getData();
-                temp = ((Lives) playerKeys.get(i).get(Lives.KEY)).getLives();
-                temp.addListener((o, oldVal, newVal) -> {
-                    myController.lifeChange(newVal.doubleValue());
-                });
-            }
-            else{
-                temp.setValue(1);
-            }
-        }
-        return temp;
-    }
 
     /**
      * Returns the lives
      * @return
      */
-    
-   	public double getLives() {
-   		return numOfLives.doubleValue();
+   	public static Integer getLives() {
+   		return livesMap.get(activeLevel);
    	}
  
    	/**
    	 * Repositions the player to the starting position.
    	 */
-	public void respawnPlayer() {
+	public static void respawnPlayer() {
 		((XPosition) playerKeys.get(activeLevel).get(XPosition.KEY)).setData(startingXPositionMap.get(activeLevel));
 		((YPosition) playerKeys.get(activeLevel).get(YPosition.KEY)).setData(startingYPositionMap.get(activeLevel));
 	}
 
 
+    public static Map<Win, Integer> getWinKeys() { return winKeys; }
+
     /**
      * Get a map of Level Number to their corresponding Player entity
      * @return
      */
-    public Map<Integer, Map<String, Component>> getPlayerKeys() {
+    public static Map<Integer, Map<String, Component>> getPlayerKeys() {
         return playerKeys;
-    }
-
-    /**
-     * Get a map of Win components to their corresponding levels
-     * @return
-     */
-    public Map<Win, Integer> getWinKeys() {
-        return winKeys;
     }
 
     /**
      * Get the value of the level currently being played
      * @return
      */
-    public int getActiveLevel() {
+    public static int getActiveLevel() {
         return activeLevel;
     }
 
@@ -184,7 +106,7 @@ public class GameManager {
      * Get the XPosition of the Player in the current active level as a double
      * @return
      */
-    public double getActivePlayerPosX() {
+    public static double getActivePlayerPosX() {
         return activePlayerPosX.getData();
     }
 
@@ -192,7 +114,7 @@ public class GameManager {
      * Get the YPosition of the Player in the current active level as a double
      * @return
      */
-    public double getActivePlayerPosY() {
+    public static double getActivePlayerPosY() {
         return activePlayerPosY.getData();
     }
 
@@ -200,8 +122,7 @@ public class GameManager {
      * Get the total number of levels
      * @return
      */
-    public int getNumOfLevels() {
-        System.out.println(numOfLevels);
+    public static int getNumOfLevels() {
         return numOfLevels;
     }
 
@@ -209,16 +130,15 @@ public class GameManager {
      * Set the value of activeLevel
      * @param level
      */
-    public void setActiveLevel(int level){
-        this.activeLevel = level;
-        if(level <= this.numOfLevels){
-
-            this.activePlayerPosX = (XPosition) playerKeys.get(level).get(XPosition.KEY);
-            this.activePlayerPosY = (YPosition) playerKeys.get(level).get(YPosition.KEY);
+    public static void setActiveLevel(int level){
+        activeLevel = level;
+        if(level <= numOfLevels){
+            activePlayerPosX = (XPosition) playerKeys.get(level).get(XPosition.KEY);
+            activePlayerPosY = (YPosition) playerKeys.get(level).get(YPosition.KEY);
         }
     }
 
-    public double getScore(){
+    public static double getScore(){
         double score = 0;
         for(Integer i : playerKeys.keySet()){
             if(playerKeys.get(i).containsKey(Score.KEY)){
@@ -229,8 +149,8 @@ public class GameManager {
         return score;
     }
     
-	public void setLives(Double numOfLives) {
-		lives = numOfLives;
+	public static void setLives(Integer lives) {
+		livesMap.put(activeLevel, lives);
 	}
 
 }

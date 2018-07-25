@@ -39,12 +39,4 @@ public class Position implements Component {
 		return KEY;
 	}
 	
-	public void setXPos(double x) {
-		xa.setData(x);
-	}
-	
-	public void setYPos(double y) {
-		ya.setData(y);
-	}
-	
 }

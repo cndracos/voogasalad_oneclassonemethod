@@ -1,6 +1,7 @@
 package gameplayer.buttons;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 import authoring.gamestate.Level;
 import data.DataGameState;
@@ -13,24 +14,22 @@ import javafx.stage.Stage;
 public class RestartButton extends Button implements IGamePlayerButton{
 
 	private final String BUTTON_NAME = "Restart Game";
-	private Controller gameController;
-	private Stage myStage;
-	private PauseMenu pauseMenu;
-	private DataGameState initialGameState;
 
-	public RestartButton(Stage stage, Controller g, PauseMenu pausemenu) {
-		pauseMenu = pausemenu;
-		myStage = stage;
-		gameController = g;
+	private Consumer hide;
+	private Consumer restartGame;
+
+	public RestartButton(Consumer hide, Consumer restartGame) {
 		this.setText(BUTTON_NAME);
 		this.setEvent();
+		this.hide = hide;
+		this.restartGame = restartGame;
 	}
 
 
 	public void setEvent() {
 		this.setOnAction(e->{
-			pauseMenu.hide();
-			gameController.restartGame();
+			hide.accept(null);
+			restartGame.accept(null);
 		});
 	}
 }

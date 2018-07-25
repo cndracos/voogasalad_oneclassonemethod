@@ -109,7 +109,7 @@ public class LevelView extends ScrollPane implements AuthoringLanguage{
 	/**
 	 * Adds entity to the level view both to be seen graphically and to the specific 
 	 * level object
-	 * @param e Entity to be added to the LevelView
+	 * @param e Entity to be added to the LevelModel
 	 */
 	public void addEntity(Entity e) {
 		this.content.getChildren().add(e);

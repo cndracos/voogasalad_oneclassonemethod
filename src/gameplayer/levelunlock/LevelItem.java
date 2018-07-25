@@ -7,21 +7,21 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.util.function.Consumer;
+
 public class LevelItem extends Button {
 
     private BooleanProperty locked;
     private int level;
-    private LevelController myController;
 
     private static final String LOCKED_STRING = "images/locked.png";
     //private static final String UNLOCKED_STRING = "images/unlocked.png";
     private static final int IMAGE_HEIGHT = 20;
     private static final int IMAGE_WIDTH = 20;
 
-    public LevelItem(int level, boolean locked, LevelController controller){
+    public LevelItem(int level, boolean locked, Consumer<Integer> levelChange){
         super();
         this.setText("Level " + level);
-        this.myController = controller;
         this.level = level;
         this.locked = new SimpleBooleanProperty();
         this.locked.addListener((o, oldVal, newVal) -> {
@@ -34,12 +34,9 @@ public class LevelItem extends Button {
                 this.setOnAction(e -> {});
             }
             else{
-               /* ImageView temp = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream(UNLOCKED_STRING)));
-                temp.setFitHeight(IMAGE_HEIGHT);
-                temp.setFitWidth(IMAGE_WIDTH);*/
                 this.setGraphic(null);
                 this.getStyleClass().add("unlockedButton");
-                this.setOnAction(e -> myController.changeGameLevel(this.level));
+                this.setOnAction(e -> levelChange.accept(this.level));
             }
         });
         setLocked(true);
